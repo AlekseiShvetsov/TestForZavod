@@ -1,12 +1,12 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.Test;
-import org.openqa.selenium.WebDriver;
+import init.DriverInstanceInit;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pages.Basic_AuthPage;
@@ -16,22 +16,29 @@ public class AuthorizationTest {
 
   AuthorizationService authorizationService = new AuthorizationService();
   Basic_AuthPage basicAuthPage = new Basic_AuthPage();
+  DriverInstanceInit driverInstanceInit = new DriverInstanceInit();
+
+  @BeforeEach
+  public void setUp() {
+    driverInstanceInit.getInstance();
+    authorizationService.openAuthorizationPage(driverInstanceInit.driver);
+  }
+
+  @AfterEach
+  public void closeUp() {
+    driverInstanceInit.closeBrowser();
+  }
 
   @Test
   public void checkAuthentication() {
-    WebDriverManager.chromedriver().setup();
-    WebDriver driver = new ChromeDriver();
 
-    authorizationService.openAuthorizationPage(driver);
-
-    WebDriverWait wait = new WebDriverWait(driver, 10);
+    WebDriverWait wait = new WebDriverWait(driverInstanceInit.driver, 10);
     WebElement titleElement = wait.until(
         ExpectedConditions.visibilityOfElementLocated(basicAuthPage.TITLE));
 
     String expectTitle = "Congratulations! You must have the proper credentials.";
-    String actualTitle = basicAuthPage.getTitle(driver).getText();
+    String actualTitle = basicAuthPage.getTitle(driverInstanceInit.driver).getText();
 
-    assertEquals("Заголовок страницы не совпадает", expectTitle, actualTitle);
-    driver.quit();
+    assertEquals(expectTitle, actualTitle, "Заголовок страницы не совпадает");
   }
 }
