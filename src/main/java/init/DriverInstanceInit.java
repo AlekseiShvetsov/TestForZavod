@@ -8,9 +8,10 @@ public class DriverInstanceInit {
 
   public WebDriver driver;
 
-  public void getInstance() {
+  public WebDriver getInstance() {
     WebDriverManager.chromedriver().setup();
     driver = new ChromeDriver();
+    return driver;
   }
 
   public void closeBrowser() {
